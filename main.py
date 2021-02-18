@@ -1,16 +1,22 @@
 import json
+import os
+import easygui
 
 
-def main():
-    with open('input.json', encoding='utf8') as f:
-        data = json.load(f)
-    transcript = json_extract(data, "transcript")
-    print(transcript)
-    save_to_txt(transcript)
+def main(files):
+    number = 0
+    for file in files:
+        with open(file, encoding='utf8') as f:
+            data = json.load(f)
+        transcript = json_extract(data, "transcript")
+        print(transcript)
+        number += 1
+        save_to_txt(transcript, number)
 
 
-def save_to_txt(data):
-    with open("data/outfile.txt", "w") as outfile:
+def save_to_txt(data, file_number):
+    path = ('data/outfile' + str(file_number) + '.txt')
+    with open(path, "w") as outfile:
         outfile.write("\n".join(data))
 
 
@@ -33,5 +39,21 @@ def json_extract(obj, key):
     return values
 
 
+def ChoseFile():
+    chose_opiton = easygui.buttonbox(msg='Chose if you want to clean one file or all from directory:',
+                                     title='Chose option', choices=['directory', 'files'])
+    if chose_opiton == "directory":
+
+        directory = easygui.diropenbox(title="Chose directory")
+        files = os.listdir(directory)
+
+        files = [i for i in files if i.endswith('.json')]
+    else:
+        files = easygui.fileopenbox(title='Chose json files', filetypes=['*.json'], multiple=True)
+
+    return files
+
+
 if __name__ == '__main__':
-    main()
+    path = ChoseFile()
+    main(path)
